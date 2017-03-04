@@ -12,12 +12,12 @@ def _create_engine(db_path, db_name):
     return engine
 
 
-def config_db(app):
+def config_db_with_app(app):
     config = app.config
     engine = _create_engine(config.get('DATABASE_PATH'), config.get('DATABASE_NAME'))
     Session.configure(bind=engine)
     from modules.file import File
-    Base.metadata.create_all(engine)
+    # Base.metadata.create_all(engine)
 
 def config_db(db_path, db_name):
     engine = _create_engine(db_path, db_name)

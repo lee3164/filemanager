@@ -1,21 +1,34 @@
 from modules import config_db
 from modules.file import File, User, Group
 from common.session import SessionHelper
-
+from common.file import get_files_by_dir
 db_path = './'
 db_name = 'test.db'
 
 def insert():
     with SessionHelper() as session:
         for i in range(10):
+            fname = 'file' + str(i)
+            f = File(fname=fname, fparent='/', ftype='r',
+                     fmode='rwxr-x---', fcomment='file: '+fname,
+                     flink='/')
+
             uname = 'user' + str(i)
-            u = User(uname=uname, usex='M', uemail=uname + '@qq.com',
+            u = User(uname=uname, usex='m', uemail=uname + '@qq.com',
                      upassword=uname, ucomment=uname)
+
             gname = 'group' + str(i)
             g = Group(gname=gname, gcomment=gname)
+            f.user = u
+            f.group = g
+
+            u.group = [g]
+
             session.add(u)
             session.add(g)
-        session.commit()
+            session.add(f)
+            session.commit()
+
 
 def modify():
     u = User.query.filter(User.uname == 'user1').first()
@@ -42,7 +55,8 @@ def search():
 
 def main():
     config_db(db_path, db_name)
-    search()
+    files = get_files_by_dir('/')
+    print files
 
 if __name__ == '__main__':
     main()

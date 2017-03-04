@@ -1,7 +1,6 @@
-from views.index import index, add_file_info, rename
+from views.index import index, get_dir_files
 
 urlpatterns = [
     ('/', index, {'methods': ['GET']}),
-    ('/add', add_file_info, {'methods': ['GET']}),
-    ('/rename', rename, {'methods': ['GET']})
+    ('/get_files_by_dir', get_dir_files, {'methods': ['GET']}),
 ]

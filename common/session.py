@@ -1,5 +1,7 @@
 from modules import Session
 
+def make_session():
+    return SessionHelper()
 
 class SessionHelper():
     def __init__(self):

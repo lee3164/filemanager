@@ -3,10 +3,16 @@ class FileManagerErrorCode(object):
 
     ERROR_CODE_PARAM_ERROR = 4000
     ERROR_CODE_FILE_EXISTED = 4001
+
+    ERROR_CODE_INTERNAL_SERVER_ERROR = 5000
+
     _err_maps = {
         ERROR_CODE_OK: 'OK',
+
         ERROR_CODE_PARAM_ERROR: 'ERROR_PARAM_ERROR',
-        ERROR_CODE_FILE_EXISTED: 'ERROR_FILE_EXISTED'
+        ERROR_CODE_FILE_EXISTED: 'ERROR_FILE_EXISTED',
+
+        ERROR_CODE_INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR'
     }
 
     @classmethod
@@ -33,3 +39,5 @@ def error_transform(err):
         return err
     elif isinstance(err, AssertionError):
         return FileManagerException(FileManagerErrorCode.ERROR_CODE_PARAM_ERROR, err.message)
+    else:
+        return FileManagerException(FileManagerErrorCode.ERROR_CODE_INTERNAL_SERVER_ERROR)

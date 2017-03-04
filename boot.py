@@ -1,7 +1,7 @@
 from flask import  Flask
 
 from urls import urlpatterns as patterns
-from modules import config_db
+from modules import config_db_with_app
 from settings import load_config
 
 def register_urls(app, patterns):
@@ -19,5 +19,5 @@ def init_app():
     app.config.from_object(load_config())
     print app.config['DATABASE_PATH']
     register_urls(app, patterns)
-    config_db(app)
+    config_db_with_app(app)
     return app

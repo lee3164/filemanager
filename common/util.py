@@ -58,3 +58,5 @@ def make_json_response(data):
 def assert_param_is_none(*args):
     for arg in args:
         assert arg is not None and arg != '', 'assert error'
+
+
