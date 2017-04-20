@@ -1,4 +1,5 @@
 from flask import  Flask
+from flask_cors import CORS
 
 from urls import urlpatterns as patterns
 from modules import config_db_with_app
@@ -16,6 +17,7 @@ def register_urls(app, patterns):
 
 def init_app():
     app = Flask(__name__)
+    CORS(app)
     app.config.from_object(load_config())
     print app.config['DATABASE_PATH']
     register_urls(app, patterns)

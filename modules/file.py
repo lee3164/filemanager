@@ -25,6 +25,7 @@ class File(Base):
 
     def to_json(self):
         ret = {
+            'fid': self.id,
             'file_name': self.fname,
             'file_parent': self.fparent,
             'file_type': self.ftype,

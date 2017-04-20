@@ -3,6 +3,7 @@ import json
 
 from common.error import FileManagerErrorCode
 
+
 def _get_param(key, default_value, value_type):
     assert request.method == 'GET'
     value = None
@@ -39,7 +40,7 @@ def get_post_param(key, default_value, value_type):
     return value
 
 
-def make_json_success_response(data):
+def make_json_success_response(data=None):
     ret = {
         'code': FileManagerErrorCode.ERROR_CODE_OK,
         'message': FileManagerErrorCode.get_err_msg(FileManagerErrorCode.ERROR_CODE_OK),
@@ -49,14 +50,16 @@ def make_json_success_response(data):
         del ret['data']
     return make_json_response(ret)
 
+
 def make_json_response(data):
     content_type = 'application/json'
     response = make_response(json.dumps(data))
     response.headers['Content-type'] = content_type
+    response.headers['Access-Control-Allow-Origin'] = 'http://127.0.0.1:8080'
+    response.headers['Access-Control-Allow-Credentials'] = "true"
     return response
+
 
 def assert_param_is_none(*args):
     for arg in args:
         assert arg is not None and arg != '', 'assert error'
-
-
