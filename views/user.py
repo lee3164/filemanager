@@ -8,10 +8,8 @@ from flask import redirect, request
 
 @handle_error_if_exist
 def login():
-    print request.form
     uname = get_post_param('user_name', '', str)
     upwd = get_post_param('user_password', '', str)
-    print '==>', uname, upwd
     assert_param_is_none(uname, upwd)
     code = user_biz.login_with_name_password(uname, upwd)
     if code != FileManagerErrorCode.ERROR_CODE_OK:

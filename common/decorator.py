@@ -20,7 +20,6 @@ def handle_error_if_exist(func):
             return make_json_response(err.error)
         else:
             return ret
-
     return _wrapped
 
 
@@ -36,7 +35,6 @@ def require_login(func):
             raise FileManagerException(c)
         setattr(request, 'user', u)
         return func(*args, **kwargs)
-
     return _wrapped
 
 

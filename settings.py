@@ -1,7 +1,7 @@
 
 class Config(object):
     DEBUG = True
-    PROGECT_PATH = '/Users/lxy-mac/Workbench/python/filemanager/'
+    PROGECT_PATH = '/home/lxy/Workbench/git/filemanager/'
     DATABASE_PATH = PROGECT_PATH
     DATABASE_NAME = 'db.sqlite'
 

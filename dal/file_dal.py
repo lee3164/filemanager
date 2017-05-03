@@ -1,4 +1,4 @@
-from modules.file import File
+from modules.file import File, FileMD5
 from common.error import FileManagerErrorCode as ErrorCode
 from common.session import make_session
 import datetime
@@ -45,6 +45,28 @@ def get_file_link(fid):
     return file.flink
 
 
+def move_file(fid, new_parent):
+    file = get_file_by_id(fid)
+    file.fparent = new_parent
+    with make_session() as session:
+        session.add(file)
+
+
+def copy_file(fid, parent):
+    file = get_file_by_id(fid)
+    params = {
+        'fname': file.fname,
+        'fparent': parent,
+        'ftype': file.ftype,
+        'fmode': file.fmode,
+        'fcomment': file.fcomment,
+        'flink': file.flink,
+        'uid': file.uid,
+        'gid': file.gid
+    }
+    return create_file(**params)
+
+
 def create_file(**params):
     model = File()
     fname = model.fname = params.pop('fname')
@@ -60,3 +82,46 @@ def create_file(**params):
 
     obj = File.query.filter(File.fname == fname).filter(File.fparent == fparent).first()
     return obj.to_json()
+
+
+def get_file_md5(md5):
+    item = FileMD5.query.filter(FileMD5.md5 == md5).first()
+    if not item:
+        return {
+            'file_link': ''
+        }
+    else:
+        return {
+            'file_link': item.fname
+        }
+
+
+def insert_file_md5(fname, md5):
+    item = FileMD5()
+    item.fname = fname
+    item.md5 = md5
+    with make_session() as session:
+        session.add(item)
+
+
+def _delete_dir(fid, session):
+    item = session.query(File).filter(File.id == fid).first()
+    dir_path = item.fparent + item.fname
+    children = session.query(File).filter(File.fparent == dir_path).all()
+    for child in children:
+        if child.ftype == 'r':
+            session.delete(child)
+        else:
+            _delete_dir(child.fid, session)
+    session.delete(item)
+
+
+def delete_dir_file(fid):
+    with make_session() as session:
+        _delete_dir(fid, session)
+
+
+def delete_regular_file(fid):
+    with make_session() as session:
+        item = session.query(File).filter(File.id == fid).first()
+        session.delete(item)

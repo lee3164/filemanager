@@ -40,6 +40,22 @@ class File(Base):
 
         return ret
 
+class FileMD5(Base):
+    """
+    CREATE TABLE file_md5 (
+        id INTEGER NOT NULL,
+        fname VARCHAR NOT NULL,
+        md5 VARCHAR(32) NOT NULL,
+        PRIMARY KEY (id)
+    )
+    """
+    __tablename__ = 'file_md5'
+
+    id = Column(Integer, primary_key=True)
+    fname = Column(String, nullable=False)
+    md5 = Column(String(32), nullable=False)
+
+
 _group_map_user_table = Table('group_map_user_table', Base.metadata,
     Column('id', Integer, primary_key=True),
     Column('uid', Integer, ForeignKey('user.id')),

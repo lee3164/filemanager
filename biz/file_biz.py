@@ -7,7 +7,9 @@ from common.error import FileManagerErrorCode as ErrorCode, \
 from operator import itemgetter
 
 
-def add_file(file_name, parent_name, mode, comment, file_type, file_link=''):
+def add_file(file_name, parent_name, mode, comment, file_type, file_link='', md5=''):
+    if md5:
+        file_dal.insert_file_md5(file_link, md5)
     user = request.user or None
     uid = user.id
     gid = user.group[0].id  # TODO: 支持多组
@@ -22,6 +24,14 @@ def add_file(file_name, parent_name, mode, comment, file_type, file_link=''):
         'gid': gid
     }
     return file_dal.create_file(**params)
+
+
+def delete_file(fid):
+    file = file_dal.get_file_by_id(fid)
+    if file.ftype == 'd':
+        file_dal.delete_dir_file(fid)
+    else:
+        file_dal.delete_regular_file(fid)
 
 
 def rename(fid, new_name):
@@ -40,11 +50,50 @@ def get_files_by_dir(dirname):
 
     data = file_dal.get_files_by_dir(dirname, user.id)
     sorted(data, key=lambda obj: (obj['file_type'], obj['file_name']))
-    return data
+    return {
+        'dir': dir_obj.to_json(),
+        'children': data
+    }
 
 
 def get_file_link(fid):
     return file_dal.get_file_link(fid)
+
+
+def move_file(fid, did):
+    file = file_dal.get_file_by_id(fid)
+    dir = file_dal.get_file_by_id(did)
+    if file is None and dir is None:
+        raise FileManagerException(ErrorCode.ERROR_CODE_FILE_NOT_EXIST)
+    _check_file_exist(fid, did)
+    new_dir = dir.fparent + dir.fname if dir.fparent != '-' else '/'
+    file_dal.move_file(fid, new_dir)
+
+
+def copy_file(fid, did):
+    file = file_dal.get_file_by_id(fid)
+    dir = file_dal.get_file_by_id(did)
+    if file is None and dir is None:
+        raise FileManagerException(ErrorCode.ERROR_CODE_FILE_NOT_EXIST)
+    _check_file_exist(fid, did)
+    parent_dir = dir.fparent + dir.fname if dir.fparent != '-' else '/'
+    return file_dal.copy_file(fid, parent_dir)
+
+
+def get_file_md5(md5):
+    return file_dal.get_file_md5(md5)
+
+def _check_file_exist(fid, did):
+    user = request.user or None
+    if user is None:
+        raise FileManagerException(ErrorCode.ERROR_CODE_REQUIRE_LOGIN)
+    file = file_dal.get_file_by_id(fid)
+    dir = file_dal.get_file_by_id(did)
+    parent_dir = dir.fparent + dir.name if dir.fparent != '-' else '/'
+    children = file_dal.get_files_by_dir(parent_dir, user.id)
+    for f in children:
+        if file.fname == f['file_name']:
+            raise FileManagerException(ErrorCode.ERROR_CODE_FILE_EXISTED)
 
 
 def _check_if_set(pos, mode):
